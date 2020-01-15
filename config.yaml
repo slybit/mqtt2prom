@@ -1,0 +1,39 @@
+# One of 'error', 'warn', 'info', 'verbose', debug', 'silly'
+loglevel: 'silly'
+# Set to true to also parse retain messages at start up
+retained: true
+# Prometheus client config
+prometheus:
+  port: 5000
+  path: 'metrics'
+mqtt:
+  # URL to MQTT broker
+  url: 'mqtt://192.168.1.10'
+  # Configuration passed to the MQTT library
+  options:
+    username: 'mqtt_username'
+    password: 'mqtt_password'
+topics:
+  - "knx/#"
+rewrites:
+    - regex: 'knx\/status\/31\/7\/1'
+      name: 'knx_status'
+      labels:
+        label: 'jknx'
+      value: 1
+    - regex: '(knx)\/(status)\/(.*\D.*)\/(.*\D.*)\/(.*\D.*)'
+      name: '{{T.3}}_{{T.4}}'
+      timestamp: '{{M.ts}}'
+      labels:
+        label: '{{T.5}}'
+        dstgad: '{{{M.dstgad}}}'
+      value: '{{M.val}}'
+      continue: true
+    - regex: 'test\/(.*)'
+      name: '{{T.1}}'
+      labels:
+        label: 'label{{T.1}}{{M.label}}'
+      value: 5
+    - regex: 'knx\/connected'
+      name: 'knx_connected'
+      value: '{{M}}'
