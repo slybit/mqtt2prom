@@ -2,8 +2,8 @@
   "name": "mqtt2prom",
   "version": "0.0.1",
   "description": "A configurable Prometheus client that exposes MQTT messsages as metrics.",
-  "main": "mqtt2prom.js",  
-  "author": "",
+  "main": "mqtt2prom.js",
+  "author": "Stefaan Seys",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
@@ -29,7 +29,5 @@
     "mustache",
     "template"
   ],
-  "author": "Stefaan Seys",
-  "license": "ISC",
   "homepage": "https://github.com/slybit/mqtt2prom"
 }

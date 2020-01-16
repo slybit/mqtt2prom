@@ -54,12 +54,6 @@ const parse = function(topic, message) {
                 metric = metrics[name];
             }
 
-            let timestamp = new Date();
-            if (r.timestamp) {
-                let ts = Number(render(r.timestamp, data));
-                if (!isNaN(ts)) timestamp = new Date(ts);
-            }
-
             let labels = {};
             if (r.labels) {
                 for (var label in r.labels) {
@@ -73,7 +67,7 @@ const parse = function(topic, message) {
 
             if (name && value !== undefined && !isNaN(value)) {
                 try {
-                    metric.set(labels, value, timestamp);
+                    metric.set(labels, value);
                     logger.info("Created metric [%s] with value %s", name, value);
                 } catch (err) {
                     logger.error("Could not create metric: %s", err.message);

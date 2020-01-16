@@ -23,7 +23,6 @@ rewrites:
       value: 1
     - regex: '(knx)\/(status)\/(.*\D.*)\/(.*\D.*)\/(.*\D.*)'
       name: '{{T.3}}_{{T.4}}'
-      timestamp: '{{M.ts}}'
       labels:
         label: '{{T.5}}'
         dstgad: '{{{M.dstgad}}}'
