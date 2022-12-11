@@ -6,7 +6,7 @@
   "author": "Stefaan Seys",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "js-yaml": "^3.13.1",
     "mqtt": "^3.0.0",
     "mustache": "^3.2.1",
