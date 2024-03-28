@@ -5,8 +5,9 @@ const mustache = require('mustache');
 const mqtt = require('mqtt');
 const client = require('prom-client');
 const register = client.register;
-const { createLogger, format, transports } = require('winston');
+const { logger } = require('./standardlogger.js');
 const config = require('./config.js').parse();
+
 
 let justStarted = true;
 
@@ -14,21 +15,8 @@ let justStarted = true;
 
 // collection of all metrics we will be accumulating
 const metrics = {};
-//register.getSingleMetric
 
-// Initate the logger
-const logger = createLogger({
-    level: config.loglevel,
-    format: format.combine(
-      format.colorize(),
-      format.splat(),
-      format.simple(),
-    ),
-    transports: [new transports.Console()]
-});
-
-
-const parse = function(topic, message) {
+const parse = function (topic, message) {
     // ensure data is Object
     let whitelist = /[^0-9a-zA-Z]/gi;
     let data = {};
@@ -45,12 +33,12 @@ const parse = function(topic, message) {
             if (!(name in metrics)) {
                 metric = new client.Gauge({
                     name: name,
-                    help : name,
+                    help: name,
                     labelNames: r.labels ? Object.keys(r.labels) : []
                 });
                 metrics[name] = metric;
-            // or reuse an exiting metric
-            } else  {
+                // or reuse an exiting metric
+            } else {
                 metric = metrics[name];
             }
 
@@ -68,9 +56,9 @@ const parse = function(topic, message) {
             if (name && value !== undefined && !isNaN(value)) {
                 try {
                     metric.set(labels, value);
-                    logger.info("Created metric [%s] with value %s", name, value);
+                    logger.verbose("Created metric with value", {'name': name, 'value': value});
                 } catch (err) {
-                    logger.error("Could not create metric: %s", err.message);
+                    logger.error("Could not create metric", {'error' : err.message});
                 }
             } else {
                 if (isNaN(value))
@@ -90,8 +78,8 @@ const parse = function(topic, message) {
 }
 
 
-const render = function(template, data) {
-    if (typeof(template) === 'string') {
+const render = function (template, data) {
+    if (typeof (template) === 'string') {
         return mustache.render(template, data);
     } else {
         return template;
@@ -100,7 +88,7 @@ const render = function(template, data) {
 
 // evaluates the mqtt message
 // expects message to be a string
-let processMessage = function(message) {
+let processMessage = function (message) {
     let data = {};
     if (message === 'true') {
         data = 1;
@@ -121,12 +109,12 @@ let processMessage = function(message) {
 
 
 
-const setMqttHandlers = function(mqttClient) {
+const setMqttHandlers = function (mqttClient) {
     mqttClient.on('connect', function () {
         logger.info('MQTT connected');
         for (const topic of config.topics) {
             mqttClient.subscribe(topic);
-            logger.verbose('subscribed to %s', topic);
+            logger.verbose('subscribed to topic', {'topic': topic});
         }
     });
 
@@ -143,11 +131,11 @@ const setMqttHandlers = function(mqttClient) {
         if (!packet.retain) justStarted = false;
         if (!justStarted || config.retained) {
             // message is a buffer
-            logger.silly("MQTT received %s : %s", topic, message)
+            logger.silly("MQTT received", {'topic': topic, 'message': message})
             message = message.toString();
             parse(topic, message);
         } else {
-            logger.silly("MQTT ignored initial retained  %s : %s", topic, message)
+            logger.silly("MQTT ignored initial retained", {'topic': topic, 'message': message})
         }
     });
 }
@@ -168,5 +156,5 @@ server.get(path, (req, res) => {
     res.end(register.metrics());
 })
 
-logger.info('Server listening on port %s, metrics exposed on %s', port, path);
+logger.info('Server listening on port, metrics exposed on path', {'port': port, 'path': path});
 server.listen(port);

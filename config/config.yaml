@@ -1,5 +1,13 @@
 # One of 'error', 'warn', 'info', 'verbose', debug', 'silly'
 loglevel: 'silly'
+ESlogging:
+    enabled: true
+    label: MQTT2PROM
+    loglevel: info
+    options:
+        indexPrefix: logs
+        clientOpts:
+            node: http://es.elastic.home
 # Set to true to also parse retain messages at start up
 retained: true
 # Prometheus client config
@@ -8,7 +16,7 @@ prometheus:
   path: 'metrics'
 mqtt:
   # URL to MQTT broker
-  url: 'mqtt://192.168.1.10'
+  url: 'mqtt://192.168.1.46'
   # Configuration passed to the MQTT library
   options:
     username: 'mqtt_username'
